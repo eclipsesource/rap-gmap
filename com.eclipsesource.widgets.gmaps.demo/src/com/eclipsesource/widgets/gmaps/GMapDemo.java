@@ -1,14 +1,13 @@
 /*******************************************************************************
- * Copyright (c) 2010 EclipseSource
+ * Copyright (c) 2010 EclipseSource and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  * 
  * Contributors:
- *     EclipseSource - initial API and implementation
+ *    EclipseSource - initial API and implementation
  ******************************************************************************/
-
 package com.eclipsesource.widgets.gmaps;
  
 import org.eclipse.equinox.app.IApplication;
@@ -66,7 +65,7 @@ public class GMapDemo implements IApplication {
     return IApplication.EXIT_OK;
   }
 
-  private void createMap( final Composite parent ) {
+  private void createMap( Composite parent ) {
     gmap = new GMap( parent, SWT.NONE );
     gmap.setCenter( stringToLatLng( INIT_CENTER ) );
     gmap.setZoom( INIT_ZOOM );
@@ -179,7 +178,7 @@ public class GMapDemo implements IApplication {
     } );    
   }
   
-  private LatLng stringToLatLng( final String input ) {
+  private LatLng stringToLatLng( String input ) {
     LatLng result = null;
     if( input != null ) {
       String temp[] = input.split( "," );

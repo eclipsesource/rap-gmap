@@ -1,11 +1,12 @@
 /*******************************************************************************
- * Copyright (c) 2010 EclipseSource and others. All rights reserved.
- * This program and the accompanying materials are made available under the
- * terms of the Eclipse Public License v1.0 which accompanies this distribution, 
- * and is available at http://www.eclipse.org/legal/epl-v10.html
+ * Copyright (c) 2010 EclipseSource and others.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *   EclipseSource - initial API and implementation
+ *    EclipseSource - initial API and implementation
  ******************************************************************************/
 package com.eclipsesource.widgets.gmaps;
 
@@ -15,6 +16,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 
 import org.eclipse.swt.browser.Browser;
+
 
 /**
  * This class can load a local html-file and the local scripts it references 
@@ -36,23 +38,21 @@ import org.eclipse.swt.browser.Browser;
  * Note that loading the html from another server wont work in RAP due to 
  * the browsers security-restrictions. 
  **/
-
 final class HtmlLoader {
   
-  static void load( final Browser browser, final String htmlFile ) {
+  static void load( Browser browser, String htmlFile ) {
     browser.setText( getHtmlContent( htmlFile ) );
   }
 
-  private static String getHtmlContent( final String url ) {
+  private static String getHtmlContent( String url ) {
     StringBuffer html = getFileContent( url );
     inlineScripts( html );
     return html.toString();
   }
 
-  private static StringBuffer getFileContent( final String file ) {
+  private static StringBuffer getFileContent( String file ) {
     StringBuffer buffer = new StringBuffer();
-    InputStream stream = 
-      HtmlLoader.class.getClassLoader().getResourceAsStream( file );
+    InputStream stream = HtmlLoader.class.getClassLoader().getResourceAsStream( file );
     if( stream != null ) {
       InputStreamReader inputStreamReader = new InputStreamReader( stream );
       BufferedReader bufferedReader = new BufferedReader( inputStreamReader );
@@ -75,7 +75,7 @@ final class HtmlLoader {
     return buffer;    
   }
 
-  private static void inlineScripts( final StringBuffer html ) {
+  private static void inlineScripts( StringBuffer html ) {
     String srcAttrStr = "src=\"./";
     String quotStr = "\"";
     String tagStr = "<script ";
@@ -94,9 +94,7 @@ final class HtmlLoader {
           newScriptTag.append( newTagStr );
           newScriptTag.append( getFileContent( filename ) );
           newScriptTag.append( closingTagStr );
-          html.replace( offset, 
-                        closeTag + closingTagStr.length(), 
-                        newScriptTag.toString() );
+          html.replace( offset, closeTag + closingTagStr.length(), newScriptTag.toString() );
         }
       }
       offset--;

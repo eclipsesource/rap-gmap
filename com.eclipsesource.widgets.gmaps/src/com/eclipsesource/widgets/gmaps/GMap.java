@@ -1,13 +1,13 @@
 /*******************************************************************************
- * Copyright (c) 2002,2010 Innoopract Informationssysteme GmbH.
+ * Copyright (c) 2002, 2010 Innoopract Informationssysteme GmbH and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  * 
  * Contributors:
- *     Innoopract Informationssysteme GmbH - initial API and implementation
- *     EclipseSource - ongoing development
+ *    Innoopract Informationssysteme GmbH - initial API and implementation
+ *    EclipseSource - ongoing development
  ******************************************************************************/
 package com.eclipsesource.widgets.gmaps;
 
@@ -20,6 +20,7 @@ import org.eclipse.swt.browser.ProgressListener;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Layout;
+
 
 public class GMap extends Composite {
 
@@ -42,7 +43,7 @@ public class GMap extends Composite {
   private boolean loaded = false;
   private ListenerList listeners = new ListenerList();
 
-  public GMap( final Composite parent, final int style ) {
+  public GMap( Composite parent, int style ) {
     super( parent, style );
     super.setLayout( new FillLayout() );
     browser = new Browser( this, SWT.NONE );
@@ -54,7 +55,7 @@ public class GMap extends Composite {
     // prevent setting another layout
   }
 
-  public void setCenter( final LatLng center ) {
+  public void setCenter( LatLng center ) {
     checkWidget();
     if( !this.center.equals( center ) && center != null ) {
       this.center = center;
@@ -73,7 +74,7 @@ public class GMap extends Composite {
   /**
    * @see GMap#AVAILABLE_TYPES
    */
-  public void setType( final int type ) {
+  public void setType( int type ) {
     checkWidget();
     if( type < 0 || type > 3 ) {
       throw new IllegalArgumentException( "Illegal map type" );
@@ -93,7 +94,7 @@ public class GMap extends Composite {
    * Zoom can be a value between 0 and 20. 
    * Not all areas have data for all levels.
    */
-  public void setZoom( final int zoom ) {
+  public void setZoom( int zoom ) {
     checkWidget();
     if( zoom < 0 || zoom > 20 ) {
       throw new IllegalArgumentException( "Illegal zoom value" );      
@@ -116,7 +117,7 @@ public class GMap extends Composite {
    * Sets the location of the map to the best result that matching the address.
    * There will be some delay while the geocoder is queried.
    */
-  public void gotoAddress( final String address ) {
+  public void gotoAddress( String address ) {
     checkWidget();
     if( loaded && address != null ) {
       this.address = address;
@@ -153,16 +154,16 @@ public class GMap extends Composite {
    * However, its currently not possible to get the location of the marker
    * should the user move it. 
    */
-  public void addMarker( final String name ) {
+  public void addMarker( String name ) {
     checkWidget();
     browser.evaluate( "addMarker( \"" + name + "\" )" );
   }
 
-  public void addMapListener( final MapListener listener ) {
+  public void addMapListener( MapListener listener ) {
     listeners.add( listener );
   }
 
-  public void removeMapListener( final MapListener listener ) {
+  public void removeMapListener( MapListener listener ) {
     listeners.remove( listener );
   }
   
@@ -205,16 +206,15 @@ public class GMap extends Composite {
     };
   }
 
-  private void syncCenter( final Double latitude, final Double longitude ) {
-    LatLng newCenter 
-      = new LatLng( latitude.doubleValue(), longitude.doubleValue() );
+  private void syncCenter( Double latitude, Double longitude ) {
+    LatLng newCenter = new LatLng( latitude.doubleValue(), longitude.doubleValue() );
     if( !center.equals( newCenter ) ) {
       center = newCenter;
       fireCenterChanged();
     }
   }
 
-  private void syncZoom( final Double zoom ) {
+  private void syncZoom( Double zoom ) {
     int newZoom = zoom.intValue();
     if( newZoom != this.zoom ) {
       this.zoom = newZoom;
