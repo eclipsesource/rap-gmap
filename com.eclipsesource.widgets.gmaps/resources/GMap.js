@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010 EclipseSource and others.
+ * Copyright (c) 2010, 2011 EclipseSource and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,58 +12,74 @@
 ///////////////////////////////
 // API - to be called from java
 
-window.init = function( center, zoom, typeId ) {
-  var options = {
-    disableDefaultUI : true,
-    zoom : zoom,
-    center : new google.maps.LatLng( center[ 0 ], center[ 1 ] ),
-    mapTypeId : typeId
-  };
+window.init = function( center, zoom, type ) {
   var parent = document.getElementById( "map_canvas" );
-  window.gmap = new google.maps.Map( parent, options );
-  window.geocoder = new google.maps.Geocoder();
-  _registerEventListener();
+  if( window[ "google" ] ) {
+    var options = {
+  	  disableDefaultUI : true,
+  	  center : new google.maps.LatLng( center[ 0 ], center[ 1 ] ),
+  	  zoom : zoom,
+  	  mapTypeId : google.maps.MapTypeId[ type ]
+    };
+    window.gmap = new google.maps.Map( parent, options );
+    window.geocoder = new google.maps.Geocoder();
+    _registerEventListener();
+  } else {
+    parent.innerHTML = '<p style="padding: 10px;">Failed to load Google Maps</p>';
+  }
 };
 
 window.gotoAddress = function( address ) {
-  geocoder.geocode( { "address" : address }, window._handleAddressResolved );
+  if( window[ "google" ] ) {
+    geocoder.geocode( { "address" : address }, window._handleAddressResolved );
+  }
 };
 
 window.resolveAddress = function() {
-  var req = { "location" : gmap.getCenter() };
-  geocoder.geocode( req, window._handleLocationResolved );
+  if( window[ "google" ] ) {
+    var req = { "location" : gmap.getCenter() };
+    geocoder.geocode( req, window._handleLocationResolved );
+  }
 };
 
 window.setCenter = function( center ) {  
-  window._blockEvents = true;
-  gmap.panTo( new google.maps.LatLng( center[ 0 ], center[ 1 ] ) );
-  window._blockEvents = false;
+  if( window[ "google" ] ) {
+    window._blockEvents = true;
+    gmap.panTo( new google.maps.LatLng( center[ 0 ], center[ 1 ] ) );
+    window._blockEvents = false;
+  }
 }
 
 window.setZoom = function( zoom ) {
-  window._blockEvents = true;
-  gmap.setZoom( zoom );
-  window._blockEvents = false;
+  if( window[ "google" ] ) {
+    window._blockEvents = true;
+    gmap.setZoom( zoom );
+    window._blockEvents = false;
+  }
 }
 
 window.setType = function( type ) {
-  gmap.setMapTypeId( type );
+  if( window[ "google" ] ) {
+    gmap.setMapTypeId( google.maps.MapTypeId[ type ] );
+  }
 }
 
 window.addMarker = function( name ) {
-  var marker = new google.maps.Marker( {
-    position : gmap.getCenter(),
-    title : name,
-    draggable : true
-  } );
-  marker.setMap( gmap );
-  var infowindow = new google.maps.InfoWindow( {
+  if( window[ "google" ] ) {
+    var marker = new google.maps.Marker( {
+      position : gmap.getCenter(),
+      title : name,
+      draggable : true
+    } );
+    marker.setMap( gmap );
+    var infowindow = new google.maps.InfoWindow( {
       content : name,
       disableAutoPan : true
-  } );
-  google.maps.event.addListener( marker, "click", function() {
-    infowindow.open( gmap, marker );
-  } );
+    } );
+    google.maps.event.addListener( marker, "click", function() {
+      infowindow.open( gmap, marker );
+    } );
+  }
 }
 
 ////////////
@@ -104,8 +120,6 @@ window._handleBoundsChanged = function() {
   // risk of recursion and buggy in SWT), therefore the "blockEvents" flag:
   if( !_blockEvents ) {
     // BrowserFunction:
-    onBoundsChanged( gmap.getCenter().lat(), 
-                     gmap.getCenter().lng(), 
-                     gmap.getZoom() );
+    onBoundsChanged( gmap.getCenter().lat(), gmap.getCenter().lng(), gmap.getZoom() );
   }
 };

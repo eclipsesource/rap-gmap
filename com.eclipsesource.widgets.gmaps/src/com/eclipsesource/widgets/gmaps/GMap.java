@@ -1,10 +1,10 @@
 /*******************************************************************************
- * Copyright (c) 2002, 2010 Innoopract Informationssysteme GmbH and others.
+ * Copyright (c) 2002, 2011 Innoopract Informationssysteme GmbH and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *    Innoopract Informationssysteme GmbH - initial API and implementation
  *    EclipseSource - ongoing development
@@ -13,6 +13,7 @@ package com.eclipsesource.widgets.gmaps;
 
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.SWTException;
 import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.browser.BrowserFunction;
 import org.eclipse.swt.browser.ProgressEvent;
@@ -34,7 +35,7 @@ public class GMap extends Composite {
   public final static int TYPE_SATELLITE = 1;
   public final static int TYPE_HYBRID = 2;
   public final static int TYPE_TERRAIN = 3;
-  
+
   private Browser browser;
   private int type = TYPE_ROADMAP;
   private String address = "";
@@ -49,7 +50,7 @@ public class GMap extends Composite {
     browser = new Browser( this, SWT.NONE );
     loadMap();
   }
-  
+
   public void setLayout( Layout layout ) {
     checkWidget();
     // prevent setting another layout
@@ -65,14 +66,17 @@ public class GMap extends Composite {
       fireCenterChanged();
     }
   }
-  
+
   public LatLng getCenter() {
     checkWidget();
     return center;
   }
-  
+
   /**
-   * @see GMap#AVAILABLE_TYPES
+   * Sets the map type.
+   * 
+   * @param type the map type, one of {@link #TYPE_HYBRID}, {@link #TYPE_ROADMAP},
+   *          {@link #TYPE_SATELLITE}, or {@link #TYPE_TERRAIN}
    */
   public void setType( int type ) {
     checkWidget();
@@ -84,20 +88,20 @@ public class GMap extends Composite {
       browser.evaluate( "setType( " + createJsMapType() + " )" );
     }
   }
-  
+
   public int getType() {
     checkWidget();
     return type;
   }
 
   /**
-   * Zoom can be a value between 0 and 20. 
+   * Zoom can be a value between 0 and 20.
    * Not all areas have data for all levels.
    */
   public void setZoom( int zoom ) {
     checkWidget();
     if( zoom < 0 || zoom > 20 ) {
-      throw new IllegalArgumentException( "Illegal zoom value" );      
+      throw new IllegalArgumentException( "Illegal zoom value" );
     }
     if( zoom != this.zoom ) {
       this.zoom = zoom;
@@ -107,12 +111,12 @@ public class GMap extends Composite {
       fireZoomChanged();
     }
   }
-  
+
   public int getZoom() {
     checkWidget();
     return zoom;
   }
-  
+
   /**
    * Sets the location of the map to the best result that matching the address.
    * There will be some delay while the geocoder is queried.
@@ -124,22 +128,22 @@ public class GMap extends Composite {
       browser.evaluate( "gotoAddress( " + createJsAddress() + " )" );
     }
   }
-  
+
   /**
    * Resolves address of current location (center).
    * Result will be received asynchronously.
-   * 
+   *
    * @see MapListener#addressResolved()
    */
   public void resolveAddress() {
     checkWidget();
     browser.evaluate( "resolveAddress()" );
   }
-  
+
   /**
-   * Returns the last address given or resolved. Will not be updated 
+   * Returns the last address given or resolved. Will not be updated
    * automatically as the location changes.
-   * 
+   *
    * @see GMap#gotoAddress(String)
    * @see GMap#resolveAddress()
    * @see MapListener#addressResolved()
@@ -148,11 +152,11 @@ public class GMap extends Composite {
     checkWidget();
     return address;
   }
-  
+
   /**
    * This adds a draggable marker with a an infowindow to the current center.
    * However, its currently not possible to get the location of the marker
-   * should the user move it. 
+   * should the user move it.
    */
   public void addMarker( String name ) {
     checkWidget();
@@ -166,10 +170,10 @@ public class GMap extends Composite {
   public void removeMapListener( MapListener listener ) {
     listeners.remove( listener );
   }
-  
+
   //////////////////////////////////
   // map creation and event-handling
-  
+
   private void loadMap() {
     HtmlLoader.load( browser, "GMap.html" );
     browser.addProgressListener( new ProgressListener() {
@@ -184,7 +188,7 @@ public class GMap extends Composite {
         script.append( ");" );
         browser.evaluate( script.toString() );
         createBrowserFunctions();
-      }     
+      }
       public void changed( ProgressEvent event ) {
       }
     } );
@@ -221,11 +225,11 @@ public class GMap extends Composite {
       fireZoomChanged();
     }
   }
-  
+
   private void resolvedAddress( String string ) {
-    // TODO : - Failed or obsolete results are handled neither here nor in js. 
+    // TODO : - Failed or obsolete results are handled neither here nor in js.
     //        - Multiple results are ignored.
-    //        - Calling the GeoCoder from client is somewhat unnecessary, could 
+    //        - Calling the GeoCoder from client is somewhat unnecessary, could
     //          be done directly from java using Google Maps Web Services.
     this.address = string;
     fireAddressResolved();
@@ -233,16 +237,16 @@ public class GMap extends Composite {
 
   /////////
   // Helper
-  
+
   private String createJsMapType() {
-    String typeStr = AVAILABLE_TYPES[ type ];
-    return "google.maps.MapTypeId." + typeStr;
+    String typeStr = '"' + AVAILABLE_TYPES[ type ] + '"';
+    return typeStr;
   }
-  
+
   private String createJsAddress() {
     return "\"" + address + "\"";
   }
-  
+
   private void fireCenterChanged() {
     Object[] allListeners = listeners.getListeners();
     for( int i = 0; i < allListeners.length; i++ ) {
@@ -250,7 +254,7 @@ public class GMap extends Composite {
       listener.centerChanged();
     }
   }
-  
+
   private void fireZoomChanged() {
     Object[] allListeners = listeners.getListeners();
     for( int i = 0; i < allListeners.length; i++ ) {
@@ -259,7 +263,6 @@ public class GMap extends Composite {
     }
   }
 
-  
   private void fireAddressResolved() {
     Object[] allListeners = listeners.getListeners();
     for( int i = 0; i < allListeners.length; i++ ) {
@@ -267,6 +270,5 @@ public class GMap extends Composite {
       listener.addressResolved();
     }
   }
-  
-  
+
 }
