@@ -10,7 +10,7 @@
 <booleanAttribute key="clearConfig" value="false"/>
 <booleanAttribute key="clearws" value="false"/>
 <booleanAttribute key="clearwslog" value="false"/>
-<stringAttribute key="configLocation" value="${workspace_loc}/.metadata/.plugins/org.eclipse.pde.core/com.eclipsesource.widgets.gmaps.demo.gmap"/>
+<stringAttribute key="configLocation" value="${workspace_loc}/.metadata/.plugins/org.eclipse.pde.core/GMapDemoRCP"/>
 <booleanAttribute key="default" value="false"/>
 <booleanAttribute key="includeOptional" value="true"/>
 <stringAttribute key="location" value="${workspace_loc}/../runtime-com.eclipsesource.widgets.gmaps.demo.gmap"/>
@@ -20,7 +20,7 @@
 <booleanAttribute key="pde.generated.config" value="false"/>
 <stringAttribute key="pde.version" value="3.3"/>
 <stringAttribute key="product" value="org.eclipse.epp.package.rcp.product"/>
-<stringAttribute key="selected_target_plugins" value="org.eclipse.core.runtime.compatibility.auth@default:default,javax.servlet@default:default,org.eclipse.ui.workbench@default:default,org.eclipse.help@default:default,org.eclipse.equinox.registry@default:default,org.eclipse.swt@default:default,org.eclipse.core.jobs@default:default,org.eclipse.osgi@-1:true,org.eclipse.core.expressions@default:default,org.eclipse.equinox.common@2:true,org.eclipse.osgi.services@default:default,org.eclipse.core.commands@default:default,org.eclipse.jface.databinding@default:default,org.eclipse.core.databinding@default:default,org.eclipse.swt.win32.win32.x86_64@default:false,org.eclipse.equinox.app@default:default,com.ibm.icu@default:default,org.eclipse.jface@default:default,org.eclipse.core.runtime@default:true,org.eclipse.core.databinding.observable@default:default,org.eclipse.core.runtime.compatibility.registry@default:false,org.eclipse.equinox.preferences@default:default,org.eclipse.core.contenttype@default:default,org.eclipse.core.databinding.property@default:default,org.eclipse.ui@default:default"/>
+<stringAttribute key="selected_target_plugins" value="org.eclipse.help@default:default,org.eclipse.core.commands@default:default,org.eclipse.equinox.registry@default:default,org.eclipse.core.runtime@default:true,org.eclipse.core.expressions@default:default,org.eclipse.core.contenttype@default:default,org.eclipse.equinox.preferences@default:default,org.eclipse.core.databinding.observable@default:default,org.eclipse.equinox.app@default:default,org.eclipse.osgi@-1:true,org.eclipse.equinox.common@2:true,org.eclipse.core.jobs@default:default,org.eclipse.osgi.services@default:default,org.eclipse.core.databinding.property@default:default,javax.servlet@default:default,org.eclipse.core.databinding@default:default"/>
 <stringAttribute key="selected_workspace_plugins" value="com.eclipsesource.widgets.gmaps.demo@default:default,com.eclipsesource.widgets.gmaps@default:default"/>
 <booleanAttribute key="show_selected_only" value="false"/>
 <booleanAttribute key="tracing" value="false"/>

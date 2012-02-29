@@ -36,13 +36,13 @@ public class GMap extends Composite {
   public final static int TYPE_HYBRID = 2;
   public final static int TYPE_TERRAIN = 3;
 
-  private Browser browser;
+  private final Browser browser;
   private int type = TYPE_ROADMAP;
   private String address = "";
   private LatLng center = new LatLng( 0, 0 );
   private int zoom = 8;
   private boolean loaded = false;
-  private ListenerList listeners = new ListenerList();
+  private final ListenerList listeners = new ListenerList();
 
   public GMap( Composite parent, int style ) {
     super( parent, style );
@@ -51,6 +51,7 @@ public class GMap extends Composite {
     loadMap();
   }
 
+  @Override
   public void setLayout( Layout layout ) {
     checkWidget();
     // prevent setting another layout
@@ -74,7 +75,7 @@ public class GMap extends Composite {
 
   /**
    * Sets the map type.
-   * 
+   *
    * @param type the map type, one of {@link #TYPE_HYBRID}, {@link #TYPE_ROADMAP},
    *          {@link #TYPE_SATELLITE}, or {@link #TYPE_TERRAIN}
    */
@@ -186,7 +187,12 @@ public class GMap extends Composite {
         script.append( zoom + "," );
         script.append( createJsMapType() );
         script.append( ");" );
-        browser.evaluate( script.toString() );
+        try {
+          browser.evaluate( script.toString() );
+        } catch( SWTException e ) {
+          // TODO Auto-generated catch block
+          e.printStackTrace();
+        }
         createBrowserFunctions();
       }
       public void changed( ProgressEvent event ) {
@@ -196,6 +202,7 @@ public class GMap extends Composite {
 
   private void createBrowserFunctions() {
     new BrowserFunction( browser, "onBoundsChanged" ) {
+      @Override
       public Object function( Object[] arguments ) {
         syncCenter( ( Double )arguments[ 0 ], ( Double )arguments[ 1 ] );
         syncZoom( ( Double )arguments[ 2 ] );
@@ -203,6 +210,7 @@ public class GMap extends Composite {
       }
     };
     new BrowserFunction( browser, "onAddressResolved" ) {
+      @Override
       public Object function( Object[] arguments ) {
         resolvedAddress( ( String ) arguments[ 0 ] );
         return null;
@@ -231,7 +239,7 @@ public class GMap extends Composite {
     //        - Multiple results are ignored.
     //        - Calling the GeoCoder from client is somewhat unnecessary, could
     //          be done directly from java using Google Maps Web Services.
-    this.address = string;
+    address = string;
     fireAddressResolved();
   }
 
