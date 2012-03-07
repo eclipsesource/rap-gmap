@@ -1,24 +1,28 @@
+/*******************************************************************************
+ * Copyright (c) 2011, 2012 EclipseSource and others.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    EclipseSource - initial API and implementation
+ ******************************************************************************/
 package org.eclipse.rap.demo.gmaps.internal;
 
-import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.rap.examples.ExampleUtil;
 import org.eclipse.rap.examples.IExamplePage;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Slider;
+import org.eclipse.swt.widgets.Scale;
 import org.eclipse.swt.widgets.Text;
 
 import com.eclipsesource.widgets.gmaps.GMap;
@@ -28,9 +32,9 @@ import com.eclipsesource.widgets.gmaps.MapAdapter;
 
 public class GMapsExamplePage implements IExamplePage {
 
-  static final private LatLng INIT_CENTER = new LatLng( 33.0, 5.0 );
-  static final private int INIT_ZOOM = 2;
-  static final private int INIT_TYPE = GMap.TYPE_HYBRID;
+  private static final LatLng INIT_CENTER = new LatLng( 33.0, 5.0 );
+  private static final int INIT_ZOOM = 2;
+  private static final int INIT_TYPE = GMap.TYPE_HYBRID;
 
   private GMap gmap;
   private Text addressText;
@@ -38,54 +42,50 @@ public class GMapsExamplePage implements IExamplePage {
   private Text lonText;
 
   public void createControl( Composite parent ) {
-    parent.setLayout( ExampleUtil.createMainLayout( 1 ) );
-    Composite mainGroup = createMainGroup( parent );
-    mainGroup.setLayoutData( ExampleUtil.createFillData() );
-    mainGroup.setLayout( ExampleUtil.createGridLayout( 1, false, 10, 10 ) );
-    Control addressControl = createAddressControl( mainGroup );
-    addressControl.setLayoutData( new GridData( SWT.FILL, SWT.TOP, true, false ) );
-    SashForm sashForm = new SashForm( mainGroup, SWT.HORIZONTAL );    
-    sashForm.setLayoutData( ExampleUtil.createFillData() );
-    createMap( sashForm );
-    createControls( sashForm );
-    sashForm.setWeights( new int[] { 7, 2 } );
+    parent.setLayout( ExampleUtil.createMainLayout( 3 ) );
+    Composite mapArea = createMapArea( parent );
+    GridData mapData = ExampleUtil.createFillData();
+    mapData.horizontalSpan = 2;
+    mapArea.setLayoutData( mapData );
+    Composite controlsArea = createControlsArea( parent );
+    controlsArea.setLayoutData( ExampleUtil.createFillData() );
   }
 
-  private void createMap( Composite parent ) {
+  private Composite createMapArea( Composite parent ) {
+    Composite composite = new Composite( parent, SWT.NONE );
+    composite.setLayout( ExampleUtil.createGridLayout( 1, false, true, true ) );
+    GMap map = createMap( composite );
+    map.setLayoutData( ExampleUtil.createFillData() );
+    return composite;
+  }
+
+  private Composite createControlsArea( Composite parent ) {
+    Composite composite = new Composite( parent, SWT.NONE );
+    composite.setLayout( ExampleUtil.createGridLayout( 2, false, true, true ) );
+    createMapTypeControl( composite );
+    createCenterControl( composite );
+    createZoomControl( composite );
+    createAddressControl( composite );
+    createMarkerControl( composite );
+    return composite;
+  }
+
+  private GMap createMap( Composite parent ) {
     gmap = new GMap( parent, SWT.BORDER );
     gmap.setCenter( INIT_CENTER );
     gmap.setZoom( INIT_ZOOM );
     gmap.setType( INIT_TYPE );
-    attachListenersToMap();
+    return gmap;
   }
 
-  private void createControls( Composite parent ) {
-    Composite controls = new Composite( parent, SWT.BORDER );
-    controls.setLayout( new GridLayout( 1, true ) );
-    createCenterControl( parent.getDisplay(), controls );
-    createZoomControl( controls );
-    createMapTypeControl( controls );
-    createMarkerControl( parent.getDisplay(), controls );
-    createResolveControl( parent.getDisplay(), controls );
-  }
-
-  private Composite createMainGroup( Composite parent ) {
-    Group group = new Group( parent, SWT.NONE );
-    group.setText( "Google Maps" );
-    return group;
-  }
-
-  private void createCenterControl( Display display, Composite parent ) {
-    new Label( parent, SWT.None ).setText( "Location:" );
-    Composite composite = new Composite( parent, SWT.NONE );
-    composite.setLayoutData( ExampleUtil.createHorzFillData() );
-    composite.setLayout( ExampleUtil.createGridLayout( 2, false, 0, 5 ) );
-    new Label( composite, SWT.None ).setText( "Lat:" );
-    latText = new Text( composite, SWT.BORDER );
+  private void createCenterControl( Composite parent ) {
+    ExampleUtil.createHeading( parent, "Location and Zoom", 2 );
+    new Label( parent, SWT.None ).setText( "Lat:" );
+    latText = new Text( parent, SWT.BORDER );
     latText.setLayoutData( ExampleUtil.createHorzFillData() );
     latText.setText( Float.toString( ( float )INIT_CENTER.latitude ) );
-    new Label( composite, SWT.None ).setText( "Lon:" );
-    lonText = new Text( composite, SWT.BORDER );
+    new Label( parent, SWT.None ).setText( "Lon:" );
+    lonText = new Text( parent, SWT.BORDER );
     lonText.setLayoutData( ExampleUtil.createHorzFillData() );
     lonText.setText( Float.toString( ( float )INIT_CENTER.longitude ) );
     ModifyListener listener = new ModifyListener() {
@@ -102,28 +102,29 @@ public class GMapsExamplePage implements IExamplePage {
 
   private void createZoomControl( Composite parent ) {
     new Label( parent, SWT.NONE ).setText( "Zoom:" );
-    final Slider zoom = new Slider( parent, SWT.NORMAL );
-    zoom.setMinimum( 0 );
-    zoom.setMaximum( 30 );
-    zoom.setSelection( INIT_ZOOM );
-    zoom.setLayoutData( new GridData( SWT.FILL, SWT.NONE, true, false ) );
-    zoom.addSelectionListener( new SelectionAdapter() {
-      public void widgetSelected(SelectionEvent e) {
-        int zoomLevel = zoom.getSelection();
-        if( zoomLevel >= 0 && zoomLevel <= 20 ) {
-          gmap.setZoom( zoomLevel );
-        }
+    final Scale zoomScale = new Scale( parent, SWT.NONE );
+    zoomScale.setMinimum( 0 );
+    zoomScale.setMaximum( 20 );
+    zoomScale.setPageIncrement( 2 );
+    zoomScale.setSelection( INIT_ZOOM );
+    zoomScale.addSelectionListener( new SelectionAdapter() {
+      @Override
+      public void widgetSelected( SelectionEvent e ) {
+        gmap.setZoom( zoomScale.getSelection() );
       }
     } );
     gmap.addMapListener( new MapAdapter() {
+      @Override
       public void zoomChanged() {
-        zoom.setSelection( gmap.getZoom() );              
+        zoomScale.setSelection( gmap.getZoom() );
       }
     } );
+    zoomScale.setLayoutData( ExampleUtil.createHorzFillData() );
   }
 
   private void createMapTypeControl( Composite parent ) {
-    new Label( parent, SWT.None ).setText( "Type:" );
+    ExampleUtil.createHeading( parent, "Map Type", 2 );
+    new Label( parent, SWT.NONE ).setText( "Type:" );
     final Combo type = new Combo( parent, SWT.DROP_DOWN | SWT.READ_ONLY );
     type.setItems( new String[]{
       "ROADMAP",
@@ -133,6 +134,7 @@ public class GMapsExamplePage implements IExamplePage {
     } );
     type.setText( "HYBRID" );
     type.addSelectionListener( new SelectionAdapter() {
+      @Override
       public void widgetSelected(SelectionEvent e) {
         int index = type.getSelectionIndex();
         if( index != -1 ) {
@@ -142,63 +144,48 @@ public class GMapsExamplePage implements IExamplePage {
     } );
   }
 
-  private Control createAddressControl( Composite parent ) {
-    Composite composite = new Composite( parent, SWT.NONE );
-    composite.setLayout( new GridLayout( 3, false ) );
-    new Label( composite, SWT.NONE ).setText( "Address:" );
-    addressText = new Text( composite, SWT.BORDER | SWT.SINGLE );
-    GridData addressTextData = new GridData( SWT.FILL, SWT.CENTER, true, false );
+  private void createAddressControl( Composite parent ) {
+    ExampleUtil.createHeading( parent, "Address", 2 );
+    addressText = new Text( parent, SWT.BORDER | SWT.SINGLE );
+    GridData addressTextData = ExampleUtil.createHorzFillData();
+    addressTextData.horizontalSpan = 2;
     addressText.setLayoutData( addressTextData );
     addressText.addSelectionListener( new SelectionAdapter() {
+      @Override
       public void widgetDefaultSelected( SelectionEvent e ) {
         gmap.gotoAddress( addressText.getText() );
       }
     } );
-    Button goButton = new Button( composite, SWT.PUSH );
+    Button goButton = new Button( parent, SWT.PUSH );
     goButton.setText( "Go" );
+    GridData layoutData = new GridData( SWT.RIGHT, SWT.CENTER, false, false );
+    layoutData.horizontalSpan = 2;
+    goButton.setLayoutData( layoutData );
     goButton.addSelectionListener( new SelectionAdapter() {
+      @Override
       public void widgetSelected( SelectionEvent e ) {
         gmap.gotoAddress( addressText.getText() );
       }
     } );
-    return composite;
   }
 
-  private void attachListenersToMap() {
-    gmap.addMapListener( new MapAdapter() {
-      public void centerChanged() {
-        LatLng center = gmap.getCenter();
-        latText.setText( Float.toString( (float) center.latitude ) );
-        lonText.setText( Float.toString( (float) center.longitude ) );
-      }
-      public void addressResolved() {
-        addressText.setText( gmap.getAddress() );
-      }
-    } );
-  }
-
-  private void createMarkerControl( Display display, Composite parent ) {
-    final InputDialog markerDialog
-      = new InputDialog( parent.getShell(), "Marker Name", "Enter Name", null, null );
-    Button addMarker = new Button( parent, SWT.PUSH );
-    addMarker.setText( "Add marker" );
-    addMarker.addSelectionListener( new SelectionAdapter() {
+  private void createMarkerControl( Composite parent ) {
+    ExampleUtil.createHeading( parent, "Marker Support", 2 );
+//    final InputDialog markerDialog
+//      = new InputDialog( parent.getShell(), "Marker Name", "Enter Name", null, null );
+    new Label( parent, SWT.NONE ).setText( "Text:" );
+    final Text markerText = new Text( parent, SWT.BORDER );
+    markerText.setLayoutData( ExampleUtil.createHorzFillData() );
+    Button addMarkerButton = new Button( parent, SWT.PUSH );
+    GridData layoutData = new GridData( SWT.RIGHT, SWT.CENTER, false, false );
+    layoutData.horizontalSpan = 2;
+    addMarkerButton.setLayoutData( layoutData );
+    addMarkerButton.setText( "Add Marker" );
+    addMarkerButton.addSelectionListener( new SelectionAdapter() {
+      @Override
       public void widgetSelected( SelectionEvent e ) {
-        markerDialog.open();
-        String result = markerDialog.getValue();
-        if( result != null && result.length() > 0 ) {
-          gmap.addMarker( result );
-        }
-      }
-    } );    
-  }
-
-  private void createResolveControl( Display display, Composite parent ) {
-    Button resolveAddressButton = new Button( parent, SWT.PUSH );
-    resolveAddressButton.setText( "Resolve location" );
-    resolveAddressButton.addSelectionListener( new SelectionAdapter() {
-      public void widgetSelected( SelectionEvent e ) {
-        gmap.resolveAddress();
+        String result = markerText.getText();
+        gmap.addMarker( result );
       }
     } );
   }
