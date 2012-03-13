@@ -1,15 +1,15 @@
 /*******************************************************************************
- * Copyright (c) 2010 EclipseSource and others.
+ * Copyright (c) 2010, 2012 EclipseSource and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *    EclipseSource - initial API and implementation
  ******************************************************************************/
 package com.eclipsesource.widgets.gmaps;
- 
+
 import org.eclipse.equinox.app.IApplication;
 import org.eclipse.equinox.app.IApplicationContext;
 import org.eclipse.swt.SWT;
@@ -32,27 +32,28 @@ import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.jface.dialogs.*;
 
+
 public class GMapDemo implements IApplication {
-  
+
   static final private String INIT_CENTER = "33.0,5.0";
   static final private int INIT_ZOOM = 2;
   static final private int INIT_TYPE = GMap.TYPE_HYBRID;
   private GMap gmap = null;
- 
+
   public Object start( IApplicationContext context ) throws Exception {
     Display display = new Display();
     final Shell shell = new Shell( display );
     shell.setText( "GMap Widget Demo" );
     shell.setLayout( new FillLayout() );
-    SashForm sash = new SashForm( shell, SWT.HORIZONTAL );    
+    SashForm sash = new SashForm( shell, SWT.HORIZONTAL );
     createMap( sash );
     Composite controls = new Composite( sash, SWT.BORDER );
     controls.setLayout( new GridLayout( 1, true ) );
-    createCenterControl( display, controls );
+    createCenterControl( controls );
     createZoomControl( controls );
     createMapTypeControl( controls );
-    createAddressControl( display, controls );
-    createMarkerControl( display, controls );
+    createAddressControl( controls );
+    createMarkerControl( controls );
     sash.setWeights( new int[] { 7, 2 } );
     shell.setSize( 900, 500 );
     shell.open();
@@ -72,27 +73,28 @@ public class GMapDemo implements IApplication {
     gmap.setType( INIT_TYPE );
   }
 
-  private void createCenterControl( Display display, Composite parent ) {
+  private void createCenterControl( Composite parent ) {
     new Label( parent, SWT.None ).setText( "Location:" );
     final Text location = new Text( parent, SWT.BORDER );
     location.setLayoutData( new GridData( SWT.FILL, SWT.TOP, true, false ) );
     location.setText( INIT_CENTER );
-    location.setFont( new Font(display, "Arial", 9, SWT.NORMAL ) );
+    location.setFont( new Font( parent.getDisplay(), "Arial", 9, SWT.NORMAL ) );
     location.addModifyListener( new ModifyListener() {
       public void modifyText( ModifyEvent event ) {
         gmap.setCenter( stringToLatLng( location.getText() ) );
       }
     } );
     gmap.addMapListener( new MapAdapter() {
+      @Override
       public void centerChanged() {
         location.setText( gmap.getCenter().toString() );
       }
     } );
   }
 
-  private void createZoomControl( Composite controls ) {
-    new Label(controls, SWT.None ).setText( "Zoom:" );
-    final Spinner zoom = new Spinner( controls, SWT.NORMAL );
+  private void createZoomControl( Composite parent ) {
+    new Label(parent, SWT.None ).setText( "Zoom:" );
+    final Spinner zoom = new Spinner( parent, SWT.NORMAL );
     zoom.setMaximum( 20 );
     zoom.setMinimum( 0 );
     zoom.setSelection( INIT_ZOOM );
@@ -102,9 +104,10 @@ public class GMapDemo implements IApplication {
       }
     } );
     gmap.addMapListener( new MapAdapter() {
+      @Override
       public void zoomChanged() {
-        zoom.setSelection( gmap.getZoom() );              
-      };
+        zoom.setSelection( gmap.getZoom() );
+      }
     } );
   }
 
@@ -119,6 +122,7 @@ public class GMapDemo implements IApplication {
     } );
     type.setText( "HYBRID" );
     type.addSelectionListener( new SelectionAdapter() {
+      @Override
       public void widgetSelected(SelectionEvent e) {
         int index = type.getSelectionIndex();
         if( index != -1 ) {
@@ -128,19 +132,21 @@ public class GMapDemo implements IApplication {
     } );
   }
 
-  private void createAddressControl( Display display, Composite parent ) {
+  private void createAddressControl( Composite parent ) {
     new Label( parent, SWT.None ).setText( "Address:" );
     final Text addr = new Text( parent, SWT.BORDER );
     addr.setLayoutData( new GridData( SWT.FILL, SWT.TOP, true, false ) );
     addr.addSelectionListener( new SelectionAdapter() {
+      @Override
       public void widgetDefaultSelected( SelectionEvent e ) {
         gmap.gotoAddress( addr.getText() );
       }
     } );
-    addr.setFont( new Font(display, "Arial", 9, SWT.NORMAL ) );
+    addr.setFont( new Font( parent.getDisplay(), "Arial", 9, SWT.NORMAL ) );
     Button goToAddr = new Button( parent, SWT.PUSH );
     goToAddr.setText( "go to" );
     goToAddr.addSelectionListener( new SelectionAdapter() {
+      @Override
       public void widgetSelected( SelectionEvent e ) {
         gmap.gotoAddress( addr.getText() );
       }
@@ -148,26 +154,26 @@ public class GMapDemo implements IApplication {
     Button resolveAddr = new Button( parent, SWT.PUSH );
     resolveAddr.setText( "resolve" );
     resolveAddr.addSelectionListener( new SelectionAdapter() {
+      @Override
       public void widgetSelected( SelectionEvent e ) {
         gmap.resolveAddress();
       }
     } );
     gmap.addMapListener( new MapAdapter() {
+      @Override
       public void addressResolved() {
         addr.setText( gmap.getAddress() );
       }
     } );
   }
 
-  private void createMarkerControl( Display display, Composite controls ) {
-    final InputDialog markerDialog = new InputDialog( controls.getShell(), 
-                                                     "Marker Name", 
-                                                     "Enter Name", 
-                                                     null, 
-                                                     null );
-    Button addMarker = new Button( controls, SWT.PUSH );
+  private void createMarkerControl( Composite parent ) {
+    final InputDialog markerDialog
+      = new InputDialog( parent.getShell(), "Marker Name", "Enter Name", null, null );
+    Button addMarker = new Button( parent, SWT.PUSH );
     addMarker.setText( "add Marker" );
     addMarker.addSelectionListener( new SelectionAdapter() {
+      @Override
       public void widgetSelected( SelectionEvent e ) {
         markerDialog.open();
         String result = markerDialog.getValue();
@@ -175,9 +181,9 @@ public class GMapDemo implements IApplication {
           gmap.addMarker( result );
         }
       }
-    } );    
+    } );
   }
-  
+
   private LatLng stringToLatLng( String input ) {
     LatLng result = null;
     if( input != null ) {
