@@ -22,6 +22,8 @@ import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Layout;
 
+import com.eclipsesource.widgets.gmaps.internal.HtmlLoader;
+
 
 public class GMap extends Composite {
 
