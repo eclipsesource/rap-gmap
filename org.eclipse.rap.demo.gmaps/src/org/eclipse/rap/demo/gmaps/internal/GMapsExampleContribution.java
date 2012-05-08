@@ -12,7 +12,7 @@ package org.eclipse.rap.demo.gmaps.internal;
 
 import org.eclipse.rap.examples.IExampleContribution;
 import org.eclipse.rap.examples.IExamplePage;
-import org.eclipse.rwt.application.ApplicationConfiguration;
+import org.eclipse.rwt.application.Application;
 
 
 public class GMapsExampleContribution implements IExampleContribution {
@@ -29,6 +29,6 @@ public class GMapsExampleContribution implements IExampleContribution {
     return new GMapsExamplePage();
   }
 
-  public void configure( ApplicationConfiguration configuration ) {
+  public void configure( Application application ) {
   }
 }
