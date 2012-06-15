@@ -7,6 +7,4 @@ Import-Package: org.eclipse.jface;resolution:=optional
 Export-Package: com.eclipsesource.widgets.gmaps
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-Vendor: EclipseSource
-Require-Bundle: org.eclipse.core.runtime;bundle-version="3.6.0",
- org.eclipse.ui;bundle-version="3.6.0";resolution:=optional,
- org.eclipse.rap.ui;bundle-version="1.4.0";resolution:=optional
+Require-Bundle: org.eclipse.rap.rwt;bundle-version="1.5.0"

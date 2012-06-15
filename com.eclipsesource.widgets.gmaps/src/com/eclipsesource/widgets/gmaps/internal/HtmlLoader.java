@@ -19,6 +19,8 @@ import org.eclipse.swt.browser.Browser;
 
 public class HtmlLoader {
 
+  private static final String RESEOURCE_PREFIX = "com/eclipsesource/widgets/gmaps/resources/";
+
   public static void load( Browser browser, String htmlFile ) {
     browser.setText( getHtmlContent( htmlFile ) );
   }
@@ -32,9 +34,9 @@ public class HtmlLoader {
 
   private static String getTextFromResource( String resourceName, String charset ) {
     try {
-      return getTextFromResourceChecked( resourceName, charset );
+      return getTextFromResourceChecked( RESEOURCE_PREFIX + resourceName, charset );
     } catch( IOException exception ) {
-      String message = "Could not read rext from resource: " + resourceName;
+      String message = "Could not read text from resource: " + resourceName;
       throw new IllegalArgumentException( message, exception );
     }
   }

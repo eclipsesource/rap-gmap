@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2002, 2011 Innoopract Informationssysteme GmbH and others.
+ * Copyright (c) 2002, 2012 Innoopract Informationssysteme GmbH and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,7 +11,9 @@
  ******************************************************************************/
 package com.eclipsesource.widgets.gmaps;
 
-import org.eclipse.core.runtime.ListenerList;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTException;
 import org.eclipse.swt.browser.Browser;
@@ -44,7 +46,7 @@ public class GMap extends Composite {
   private LatLng center = new LatLng( 0, 0 );
   private int zoom = 8;
   private boolean loaded = false;
-  private final ListenerList listeners = new ListenerList();
+  private final List<MapListener> listeners = new ArrayList<MapListener>();
 
   public GMap( Composite parent, int style ) {
     super( parent, style );
@@ -249,8 +251,7 @@ public class GMap extends Composite {
   // Helper
 
   private String createJsMapType() {
-    String typeStr = '"' + AVAILABLE_TYPES[ type ] + '"';
-    return typeStr;
+    return '"' + AVAILABLE_TYPES[ type ] + '"';
   }
 
   private String createJsAddress() {
@@ -258,25 +259,19 @@ public class GMap extends Composite {
   }
 
   private void fireCenterChanged() {
-    Object[] allListeners = listeners.getListeners();
-    for( int i = 0; i < allListeners.length; i++ ) {
-      MapListener listener = ( MapListener )allListeners[ i ];
+    for( MapListener listener : listeners ) {
       listener.centerChanged();
     }
   }
 
   private void fireZoomChanged() {
-    Object[] allListeners = listeners.getListeners();
-    for( int i = 0; i < allListeners.length; i++ ) {
-      MapListener listener = ( MapListener )allListeners[ i ];
+    for( MapListener listener : listeners ) {
       listener.zoomChanged();
     }
   }
 
   private void fireAddressResolved() {
-    Object[] allListeners = listeners.getListeners();
-    for( int i = 0; i < allListeners.length; i++ ) {
-      MapListener listener = ( MapListener )allListeners[ i ];
+    for( MapListener listener : listeners ) {
       listener.addressResolved();
     }
   }
