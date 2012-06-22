@@ -40,6 +40,7 @@ public class GMapsExamplePage implements IExamplePage {
   private Text addressText;
   private Text latText;
   private Text lonText;
+  private boolean internalChange = false;
 
   public void createControl( Composite parent ) {
     parent.setLayout( ExampleUtil.createMainLayout( 3 ) );
@@ -91,11 +92,26 @@ public class GMapsExamplePage implements IExamplePage {
     ModifyListener listener = new ModifyListener() {
       public void modifyText( ModifyEvent event ) {
         LatLng newCenter = getLatLonFromTextFields();
-        if( newCenter != null ) {
+        if( !internalChange && newCenter != null ) {
+          // Prevent the map listeners from setting text again, as it would reset caret position 
+          internalChange = true;
           gmap.setCenter( newCenter );
+          internalChange = false;
         }
       }
     };
+    gmap.addMapListener( new MapAdapter() {
+      public void centerChanged() {
+        if( !internalChange ) {
+          LatLng center = gmap.getCenter();
+          // We have to prevent the modify listeners from setting an "incomplete" new center: 
+          internalChange = true; 
+          latText.setText( String.valueOf( center.latitude ) );
+          lonText.setText( String.valueOf( center.longitude ) );
+          internalChange = false;
+        }
+      }
+    } );
     latText.addModifyListener( listener );
     lonText.addModifyListener( listener );
   }
