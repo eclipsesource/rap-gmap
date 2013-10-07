@@ -14,5 +14,13 @@
          </run>
       </application>
    </extension>
+   <extension
+         point="org.eclipse.rap.ui.entrypoint">
+      <entrypoint
+            applicationId="com.eclipsesource.widgets.gmaps.demo.gmap"
+            id="com.eclipsesource.widgets.gmaps.demo.entrypoint"
+            path="/gmaps">
+      </entrypoint>
+   </extension>
 
 </plugin>
