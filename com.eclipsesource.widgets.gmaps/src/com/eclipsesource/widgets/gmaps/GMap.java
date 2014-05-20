@@ -66,7 +66,7 @@ public class GMap extends Composite {
     if( !this.center.equals( center ) && center != null ) {
       this.center = center;
       if( loaded ) {
-        browser.evaluate( "setCenter( [ " + center.toString() + " ] );" );
+        eval( "setCenter( [ " + center.toString() + " ] );" );
       }
       fireCenterChanged();
     }
@@ -90,7 +90,7 @@ public class GMap extends Composite {
     }
     this.type = type;
     if( loaded ) {
-      browser.evaluate( "setType( " + createJsMapType() + " )" );
+      eval( "setType( " + createJsMapType() + " )" );
     }
   }
 
@@ -111,7 +111,7 @@ public class GMap extends Composite {
     if( zoom != this.zoom ) {
       this.zoom = zoom;
       if( loaded ) {
-        browser.evaluate( "setZoom( " + Integer.toString( zoom ) + " )");
+        eval( "setZoom( " + Integer.toString( zoom ) + " )");
       }
       fireZoomChanged();
     }
@@ -130,7 +130,7 @@ public class GMap extends Composite {
     checkWidget();
     if( loaded && address != null ) {
       this.address = address;
-      browser.evaluate( "gotoAddress( " + createJsAddress() + " )" );
+      eval( "gotoAddress( " + createJsAddress() + " )" );
     }
   }
 
@@ -142,7 +142,7 @@ public class GMap extends Composite {
    */
   public void resolveAddress() {
     checkWidget();
-    browser.evaluate( "resolveAddress()" );
+    eval( "resolveAddress()" );
   }
 
   /**
@@ -165,7 +165,7 @@ public class GMap extends Composite {
    */
   public void addMarker( String name ) {
     checkWidget();
-    browser.evaluate( "addMarker( \"" + name + "\" )" );
+    eval( "addMarker( \"" + name + "\" )" );
   }
 
   public void addMapListener( MapListener listener ) {
@@ -192,7 +192,7 @@ public class GMap extends Composite {
         script.append( createJsMapType() );
         script.append( ");" );
         try {
-          browser.evaluate( script.toString() );
+          eval( script.toString() );
         } catch( SWTException e ) {
           // TODO Auto-generated catch block
           e.printStackTrace();
@@ -273,6 +273,16 @@ public class GMap extends Composite {
   private void fireAddressResolved() {
     for( MapListener listener : listeners ) {
       listener.addressResolved();
+    }
+  }
+
+  private void eval( String script ) {
+    try {
+      browser.evaluate( script );
+    } catch( IllegalStateException e ) {
+      // user probably clicked too fast, let him try again
+      // TODO: In the long run should be replaced by BrowserUtil.evalute somehow,
+      // as it is JEE Mode compatible and may support queued scripts in the future. 
     }
   }
 
